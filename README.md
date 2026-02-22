@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>🦅 Ulak</h1>
+  <h1>Ulak</h1>
   <p><b>Intelligent Log Analyzer & 5W1H Diagnostic Engine</b></p>
 
   [![Project Status](https://img.shields.io/badge/Status-Active_Development-brightgreen)](https://github.com/erogluyusuf/ulak)
