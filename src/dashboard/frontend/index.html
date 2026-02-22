@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>ULAK AI Dashboard</title>
+
+    <!-- Vue -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="app" v-cloak class="dashboard-layout">
+
+    <!-- HEADER -->
+    <header class="dashboard-header">
+        <div>
+            <h1 class="dashboard-title">ULAK AI</h1>
+            <p class="dashboard-sub">Enterprise Security Dashboard</p>
+        </div>
+
+        <div class="header-right">
+            <div class="last-update">
+                <span>Son Güncelleme</span>
+                <strong>{{ lastUpdate }}</strong>
+            </div>
+            <button @click="fetchData" class="refresh-btn">
+                <i class="fas fa-rotate"></i>
+            </button>
+        </div>
+    </header>
+
+
+    <!-- STATS -->
+    <section class="stats-grid">
+
+        <div class="stat-card">
+            <p>Toplam Olay</p>
+            <h3>{{ incidents.length }}</h3>
+        </div>
+
+        <div class="stat-card blue">
+            <p>AI Teşhis Oranı</p>
+            <h3>%{{ aiRatio }}</h3>
+        </div>
+
+        <div class="stat-card green">
+            <p>Sistem Durumu</p>
+            <h3>STABLE</h3>
+        </div>
+
+    </section>
+
+
+    <!-- TABLE -->
+    <section class="table-wrapper">
+
+        <table class="incident-table">
+            <thead>
+                <tr>
+                    <th>Zaman</th>
+                    <th>Process</th>
+                    <th>Teşhis</th>
+                    <th>Kaynak</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr v-for="log in incidents" :key="log.when">
+                    <td class="time">
+                        {{ log.when.split(' ')[1] }}
+                    </td>
+
+                    <td>
+                        <strong>{{ log.raw_data.cmd }}</strong>
+                        <div class="pid">PID: {{ log.raw_data.pid }}</div>
+                    </td>
+
+                    <td class="why">
+                        {{ log.why }}
+                    </td>
+
+                    <td>
+                        <span :class="log.raw_data.source === 'AI' ? 'badge-ai' : 'badge-system'">
+                            {{ log.raw_data.source }}
+                        </span>
+                    </td>
+
+                    <td class="actions">
+                        <button @click="openDetails(log)">Detay</button>
+                        <button @click="triggerFix(log)" class="fix-btn">FIX</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div v-if="incidents.length === 0" class="empty-state">
+            <i class="fas fa-check-circle"></i>
+            <h4>Tüm Sistemler Normal</h4>
+        </div>
+
+    </section>
+
+</div>
+
+<script src="assets/js/script.js"></script>
+</body>
+</html>

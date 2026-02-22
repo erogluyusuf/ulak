@@ -1,0 +1,246 @@
+{
+    "exit_codes": {
+        "1": "System Error: Operation not permitted",
+        "2": "System Error: No such file or directory",
+        "3": "System Error: No such process",
+        "4": "System Error: Interrupted system call",
+        "5": "System Error: Input/output error",
+        "6": "System Error: No such device or address",
+        "7": "System Error: Argument list too long",
+        "8": "System Error: Exec format error",
+        "9": "System Error: Bad file descriptor",
+        "10": "System Error: No child processes",
+        "11": "System Error: Resource temporarily unavailable",
+        "12": "System Error: Cannot allocate memory",
+        "13": "System Error: Permission denied",
+        "14": "System Error: Bad address",
+        "15": "System Error: Block device required",
+        "16": "System Error: Device or resource busy",
+        "17": "System Error: File exists",
+        "18": "System Error: Invalid cross-device link",
+        "19": "System Error: No such device",
+        "20": "System Error: Not a directory",
+        "21": "System Error: Is a directory",
+        "22": "System Error: Invalid argument",
+        "23": "System Error: Too many open files in system",
+        "24": "System Error: Too many open files",
+        "25": "System Error: Inappropriate ioctl for device",
+        "26": "System Error: Text file busy",
+        "27": "System Error: File too large",
+        "28": "System Error: No space left on device",
+        "29": "System Error: Illegal seek",
+        "30": "System Error: Read-only file system",
+        "31": "System Error: Too many links",
+        "32": "System Error: Broken pipe",
+        "33": "System Error: Numerical argument out of domain",
+        "34": "System Error: Numerical result out of range",
+        "35": "System Error: Resource deadlock avoided",
+        "36": "System Error: File name too long",
+        "37": "System Error: No locks available",
+        "38": "System Error: Function not implemented",
+        "39": "System Error: Directory not empty",
+        "40": "System Error: Too many levels of symbolic links",
+        "42": "System Error: No message of desired type",
+        "43": "System Error: Identifier removed",
+        "44": "System Error: Channel number out of range",
+        "45": "System Error: Level 2 not synchronized",
+        "46": "System Error: Level 3 halted",
+        "47": "System Error: Level 3 reset",
+        "48": "System Error: Link number out of range",
+        "49": "System Error: Protocol driver not attached",
+        "50": "System Error: No CSI structure available",
+        "51": "System Error: Level 2 halted",
+        "52": "System Error: Invalid exchange",
+        "53": "System Error: Invalid request descriptor",
+        "54": "System Error: Exchange full",
+        "55": "System Error: No anode",
+        "56": "System Error: Invalid request code",
+        "57": "System Error: Invalid slot",
+        "59": "System Error: Bad font file format",
+        "60": "System Error: Device not a stream",
+        "61": "System Error: No data available",
+        "62": "System Error: Timer expired",
+        "63": "System Error: Out of streams resources",
+        "64": "System Error: Machine is not on the network",
+        "65": "System Error: Package not installed",
+        "66": "System Error: Object is remote",
+        "67": "System Error: Link has been severed",
+        "68": "System Error: Advertise error",
+        "69": "System Error: Srmount error",
+        "70": "System Error: Communication error on send",
+        "71": "System Error: Protocol error",
+        "72": "System Error: Multihop attempted",
+        "73": "System Error: RFS specific error",
+        "74": "System Error: Bad message",
+        "75": "System Error: Value too large for defined data type",
+        "76": "System Error: Name not unique on network",
+        "77": "System Error: File descriptor in bad state",
+        "78": "System Error: Remote address changed",
+        "79": "System Error: Can not access a needed shared library",
+        "80": "System Error: Accessing a corrupted shared library",
+        "81": "System Error: .lib section in a.out corrupted",
+        "82": "System Error: Attempting to link in too many shared libraries",
+        "83": "System Error: Cannot exec a shared library directly",
+        "84": "System Error: Invalid or incomplete multibyte or wide character",
+        "85": "System Error: Interrupted system call should be restarted",
+        "86": "System Error: Streams pipe error",
+        "87": "System Error: Too many users",
+        "88": "System Error: Socket operation on non-socket",
+        "89": "System Error: Destination address required",
+        "90": "System Error: Message too long",
+        "91": "System Error: Protocol wrong type for socket",
+        "92": "System Error: Protocol not available",
+        "93": "System Error: Protocol not supported",
+        "94": "System Error: Socket type not supported",
+        "95": "System Error: Operation not supported",
+        "96": "System Error: Protocol family not supported",
+        "97": "System Error: Address family not supported by protocol",
+        "98": "System Error: Address already in use",
+        "99": "System Error: Cannot assign requested address",
+        "100": "System Error: Network is down",
+        "101": "System Error: Network is unreachable",
+        "102": "System Error: Network dropped connection on reset",
+        "103": "System Error: Software caused connection abort",
+        "104": "System Error: Connection reset by peer",
+        "105": "System Error: No buffer space available",
+        "106": "System Error: Transport endpoint is already connected",
+        "107": "System Error: Transport endpoint is not connected",
+        "108": "System Error: Cannot send after transport endpoint shutdown",
+        "109": "System Error: Too many references: cannot splice",
+        "110": "System Error: Connection timed out",
+        "111": "System Error: Connection refused",
+        "112": "System Error: Host is down",
+        "113": "System Error: No route to host",
+        "114": "System Error: Operation already in progress",
+        "115": "System Error: Operation now in progress",
+        "116": "System Error: Stale file handle",
+        "117": "System Error: Structure needs cleaning",
+        "118": "System Error: Not a XENIX named type file",
+        "119": "System Error: No XENIX semaphores available",
+        "120": "System Error: Is a named type file",
+        "121": "System Error: Remote I/O error",
+        "122": "System Error: Disk quota exceeded",
+        "123": "System Error: No medium found",
+        "124": "System Error: Wrong medium type",
+        "125": "System Error: Operation canceled",
+        "129": "SIGHUP - Terminal closed or parent process died.",
+        "130": "SIGINT - Process interrupted by user (Ctrl+C).",
+        "131": "SIGQUIT - Process quit with core dump.",
+        "132": "SIGILL - Illegal Instruction (CPU cannot execute this).",
+        "134": "SIGABRT - Process aborted itself (Internal failure).",
+        "136": "SIGFPE - Floating point exception (e.g., division by zero).",
+        "137": "SIGKILL - Process killed by OOM (Out of Memory).",
+        "138": "SIGBUS - Bus error (Hardware or bad memory access).",
+        "139": "SIGSEGV - Segmentation Fault (Memory access violation).",
+        "141": "SIGPIPE - Broken pipe (No reader for this output).",
+        "143": "SIGTERM - Process gracefully terminated."
+    },
+    "service_patterns": {
+        "AH00072": "Apache: Port bind failed. Check if port 80/443 is used by another app.",
+        "Address already in use": "Network conflict: Port is already bound. Use 'ss -tulpn' to check.",
+        "Access denied for user": "DB Error: Authentication failed or insufficient permissions.",
+        "Can't connect to local MySQL server": "MySQL Error: Socket file missing or service is down.",
+        "No such file or directory": "Path Error: A required file or binary is missing.",
+        "Permission denied": "Security Error: Check file/folder permissions or SELinux/AppArmor.",
+        "apache_error": {
+            "regex": "AH[0-9]{5}",
+            "description": "Apache HTTPD internal error code."
+        },
+        "kernel_panic": {
+            "regex": "Kernel panic|Out of memory",
+            "description": "Critical Linux Kernel event."
+        },
+        "apache_httpduser": {
+            "regex": "%{EMAILADDRESS}|%{USER}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "apache_httpderror_date": {
+            "regex": "%{DAY} %{MONTH} %{MONTHDAY} %{TIME} %{YEAR}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "apache_httpd_commonlog": {
+            "regex": "%{IPORHOST:clientip} %{HTTPDUSER:ident} %{HTTPDUSER:auth} \\[%{HTTPDATE:timestamp}\\] \"(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})\" (?:-|%{NUMBER:response}) (?:-|%{NUMBER:bytes})",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "apache_httpd_combinedlog": {
+            "regex": "%{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "apache_httpd20_errorlog": {
+            "regex": "\\[%{HTTPDERROR_DATE:timestamp}\\] \\[%{LOGLEVEL:loglevel}\\] (?:\\[client %{IPORHOST:clientip}\\] ){0,1}%{GREEDYDATA:message}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "apache_httpd24_errorlog": {
+            "regex": "\\[%{HTTPDERROR_DATE:timestamp}\\] \\[(?:%{WORD:module})?:%{LOGLEVEL:loglevel}\\] \\[pid %{POSINT:pid}(:tid %{NUMBER:tid})?\\]( \\(%{POSINT:proxy_errorcode}\\)%{DATA:proxy_message}:)?( \\[client %{IPORHOST:clientip}:%{POSINT:clientport}\\])?( %{DATA:errorcode}:)? %{GREEDYDATA:message}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "apache_httpd_errorlog": {
+            "regex": "%{HTTPD20_ERRORLOG}|%{HTTPD24_ERRORLOG}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "apache_commonapachelog": {
+            "regex": "%{HTTPD_COMMONLOG}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "apache_combinedapachelog": {
+            "regex": "%{HTTPD_COMBINEDLOG}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "postgresql_postgresql": {
+            "regex": "%{DATESTAMP:timestamp} %{TZ} %{DATA:user_id} %{GREEDYDATA:connection_id} %{POSINT:pid}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "redis_redistimestamp": {
+            "regex": "%{MONTHDAY} %{MONTH} %{TIME}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "redis_redislog": {
+            "regex": "\\[%{POSINT:pid}\\] %{REDISTIMESTAMP:timestamp} \\*",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "redis_redismonlog": {
+            "regex": "%{NUMBER:timestamp} \\[%{INT:database} %{IP:client}:%{NUMBER:port}\\] \"%{WORD:command}\"\\s?%{GREEDYDATA:params}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_syslog5424printascii": {
+            "regex": "[!-~]+",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_syslogbase2": {
+            "regex": "(?:%{SYSLOGTIMESTAMP:timestamp}|%{TIMESTAMP_ISO8601:timestamp8601}) (?:%{SYSLOGFACILITY} )?%{SYSLOGHOST:logsource}+(?: %{SYSLOGPROG}:|)",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_syslogpamsession": {
+            "regex": "%{SYSLOGBASE} (?=%{GREEDYDATA:message})%{WORD:pam_module}\\(%{DATA:pam_caller}\\): session %{WORD:pam_session_state} for user %{USERNAME:username}(?: by %{GREEDYDATA:pam_by})?",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_cron_action": {
+            "regex": "[A-Z ]+",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_cronlog": {
+            "regex": "%{SYSLOGBASE} \\(%{USER:user}\\) %{CRON_ACTION:action} \\(%{DATA:message}\\)",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_syslogline": {
+            "regex": "%{SYSLOGBASE2} %{GREEDYDATA:message}",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_syslog5424pri": {
+            "regex": "<%{NONNEGINT:syslog5424_pri}>",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_syslog5424sd": {
+            "regex": "\\[%{DATA}\\]+",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_syslog5424base": {
+            "regex": "%{SYSLOG5424PRI}%{NONNEGINT:syslog5424_ver} +(?:%{TIMESTAMP_ISO8601:syslog5424_ts}|-) +(?:%{IPORHOST:syslog5424_host}|-) +(-|%{SYSLOG5424PRINTASCII:syslog5424_app}) +(-|%{SYSLOG5424PRINTASCII:syslog5424_proc}) +(-|%{SYSLOG5424PRINTASCII:syslog5424_msgid}) +(?:%{SYSLOG5424SD:syslog5424_sd}|-|)",
+            "description": "Imported from official Logstash grok patterns"
+        },
+        "linux_syslog_syslog5424line": {
+            "regex": "%{SYSLOG5424BASE} +%{GREEDYDATA:syslog5424_msg}",
+            "description": "Imported from official Logstash grok patterns"
+        }
+    }
+}
