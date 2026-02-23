@@ -1,40 +1,100 @@
 #include <uapi/linux/ptrace.h>
 #include <linux/sched.h>
 #include <linux/fs.h>
+#include <linux/dcache.h>
 
-struct data_t {
+struct data_t
+{
     u32 pid;
     int exit_code;
     char comm[TASK_COMM_LEN];
-    char msg[128]; // Hata metnini burada taşıyacağız
+    char msg[128];
 };
 
 BPF_PERF_OUTPUT(events);
 
-// 1. Yazma işlemlerini izle (Özellikle stderr)
-KFUNC_PROBE(vfs_write, struct file *file, const char __user *buf, size_t count, loff_t *pos) {
+KFUNC_PROBE(vfs_write, struct file *file, const char __user *buf, size_t count, loff_t *pos)
+{
     struct data_t data = {};
-    
-    // Sadece stderr (fd 2) akışını yakalamaya çalışıyoruz
-    // Basitleştirilmiş mantık: Yazılan veriyi al
     data.pid = bpf_get_current_pid_tgid() >> 32;
     bpf_get_current_comm(&data.comm, sizeof(data.comm));
-    
-    // Mesajı kullanıcı alanından çek (Grok analizi için lazım)
+
     bpf_probe_read_user(&data.msg, sizeof(data.msg), buf);
-    
+
     events.perf_submit(ctx, &data, sizeof(data));
     return 0;
 }
 
-// 2. Çıkış kodunu hala takip ediyoruz
-void trace_do_exit(struct pt_regs *ctx, long code) {
+void trace_do_exit(struct pt_regs *ctx, long code)
+{
     struct data_t data = {};
     data.pid = bpf_get_current_pid_tgid() >> 32;
     data.exit_code = (code >> 8) & 0xFF;
     bpf_get_current_comm(&data.comm, sizeof(data.comm));
-    
-    if (data.exit_code > 0) {
+
+    if (data.exit_code > 0)
+    {
         events.perf_submit(ctx, &data, sizeof(data));
     }
+}
+
+struct exec_data_t
+{
+    u32 pid;
+    u32 ppid;
+    u32 uid;
+    char comm[TASK_COMM_LEN];
+    char pcomm[TASK_COMM_LEN];
+    char fname[128];
+};
+
+BPF_PERF_OUTPUT(exec_events);
+
+TRACEPOINT_PROBE(syscalls, sys_enter_execve)
+{
+    struct exec_data_t data = {};
+
+    data.pid = bpf_get_current_pid_tgid() >> 32;
+    data.uid = bpf_get_current_uid_gid() & 0xFFFFFFFF;
+    bpf_get_current_comm(&data.comm, sizeof(data.comm));
+
+    bpf_probe_read_user_str(&data.fname, sizeof(data.fname), args->filename);
+
+    struct task_struct *task = (struct task_struct *)bpf_get_current_task();
+    bpf_probe_read_kernel(&data.ppid, sizeof(data.ppid), &task->real_parent->tgid);
+    bpf_probe_read_kernel(&data.pcomm, sizeof(data.pcomm), &task->real_parent->comm);
+
+    exec_events.perf_submit(args, &data, sizeof(data));
+    return 0;
+}
+
+struct file_event_t
+{
+    u32 pid;
+    u32 uid;
+    char comm[TASK_COMM_LEN];
+    char filename[256];
+};
+
+BPF_PERF_OUTPUT(file_events);
+
+int trace_vfs_write_entry(struct pt_regs *ctx, struct file *file)
+{
+    struct file_event_t event = {};
+
+    event.pid = bpf_get_current_pid_tgid() >> 32;
+    event.uid = bpf_get_current_uid_gid() & 0xFFFFFFFF;
+    bpf_get_current_comm(&event.comm, sizeof(event.comm));
+
+    struct dentry *de = file->f_path.dentry;
+    struct qstr d_name = de->d_name;
+
+    bpf_probe_read_kernel_str(&event.filename, sizeof(event.filename), d_name.name);
+
+    if (event.filename[0] != 0)
+    {
+        file_events.perf_submit(ctx, &event, sizeof(event));
+    }
+
+    return 0;
 }

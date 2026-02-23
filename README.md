@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/assets/logo-unbg.png" alt="Ulak Logo" width="200">
+  <img src="docs/assets/logo-unbg.png" alt="Ulak Logo" width="400">
   <h1>ULAK AI</h1>
   <p><b>Next-Gen eBPF-Powered Threat Detection & Local AI Diagnostic Engine</b></p>
 

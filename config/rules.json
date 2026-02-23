@@ -835,6 +835,15 @@
         }
     },
     "service_patterns": {
+        "reconnaissance": {
+            "regex": "\\b(nmap|nc|netcat|whoami|masscan|rustscan|zenmap|angryipscanner|zmap)\\b",
+            "description": "Suspicious reconnaissance and network scanning tool executed.",
+            "severity": "high",
+            "risk_score": 85,
+            "category": "reconnaissance",
+            "mitre": "T1046",
+            "action_cmd": "kill -9 {pid}"
+        },
         "ah00072": {
             "regex": "AH00072",
             "description": "Apache: Port bind failed. Check if port 80/443 is used by another app.",
@@ -843,7 +852,7 @@
             "category": "service",
             "action": "Check system configuration for conflicting services.",
             "action_cmd": "ps aux | grep -i port"
-        },
+        },      
         "reverse_shell": {
             "regex": "nc .* -e|bash -i >& /dev/tcp",
             "description": "Possible reverse shell activity.",
