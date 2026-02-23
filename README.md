@@ -67,7 +67,7 @@ Captured anomalies are analyzed by a **Local LLM** (Large Language Model) to gen
 ### Installation
 1. **Clone the repository:**
    ```bash
-   git clone [https://github.com/erogluyusuf/ulak.git](https://github.com/erogluyusuf/ulak.git)
+   git clone https://github.com/erogluyusuf/ulak.git
    cd ulak
    ```
 
