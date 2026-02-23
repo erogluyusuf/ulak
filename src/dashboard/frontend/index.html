@@ -1,117 +1,241 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ULAK AI Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ULAK </title>
 
-    <!-- Vue -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
-    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        [v-cloak] { display: none; }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 
-<div id="app" v-cloak class="dashboard-layout">
+<div id="app" v-cloak class="dashboard-layout relative">
 
-    <!-- HEADER -->
     <header class="dashboard-header">
         <div>
-            <h1 class="dashboard-title">ULAK AI</h1>
+            <h1 class="dashboard-title">ULAK</h1>
             <p class="dashboard-sub">Enterprise Security Dashboard</p>
         </div>
 
         <div class="header-right">
             <div class="last-update">
-                <span>Son Güncelleme</span>
+                <span>Last Updated</span>
                 <strong>{{ lastUpdate }}</strong>
             </div>
-            <button @click="fetchData" class="refresh-btn">
+            <button @click="fetchData" class="refresh-btn transition hover:shadow-md">
                 <i class="fas fa-rotate"></i>
             </button>
         </div>
     </header>
 
-
-    <!-- STATS -->
     <section class="stats-grid">
-
         <div class="stat-card">
-            <p>Toplam Olay</p>
+            <p>Total Incidents</p>
             <h3>{{ incidents.length }}</h3>
         </div>
-
         <div class="stat-card blue">
-            <p>AI Teşhis Oranı</p>
+            <p>AI Diagnosis Rate</p>
             <h3>%{{ aiRatio }}</h3>
         </div>
-
         <div class="stat-card green">
-            <p>Sistem Durumu</p>
-            <h3>STABLE</h3>
+            <p>System Status</p>
+            <h3>
+                <span v-if="incidents.length === 0">STABLE</span>
+                <span v-else class="text-orange-500">ACTIVE THREAT</span>
+            </h3>
         </div>
-
     </section>
 
-
-    <!-- TABLE -->
-    <section class="table-wrapper">
-
-        <table class="incident-table">
+    <section class="table-wrapper relative">
+        <table class="incident-table" v-if="incidents.length > 0">
             <thead>
                 <tr>
-                    <th>Zaman</th>
+                    <th>Time</th>
                     <th>Process</th>
-                    <th>Teşhis</th>
-                    <th>Kaynak</th>
-                    <th></th>
+                    <th>Severity</th>
+                    <th>Risk Score</th>
+                    <th>Diagnosis Summary</th>
+                    <th>Source</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-
             <tbody>
-                <tr v-for="log in incidents" :key="log.when">
+                <tr v-for="(log, index) in incidents" :key="index" class="hover:bg-slate-50 transition">
                     <td class="time">
-                        {{ log.when.split(' ')[1] }}
+                        {{ log?.when ? log.when.split(' ')[1] : '--:--:--' }}
                     </td>
 
                     <td>
-                        <strong>{{ log.raw_data.cmd }}</strong>
-                        <div class="pid">PID: {{ log.raw_data.pid }}</div>
+                        <strong>{{ log?.raw_data?.cmd || 'Unknown' }}</strong>
+                        <div class="pid text-xs opacity-60">PID: {{ log?.raw_data?.pid || '-' }}</div>
+                    </td>
+
+                    <td>
+                        <span :class="'badge-severity ' + (log.severity ? log.severity.toLowerCase() : 'low')">
+                            {{ log.severity === 'critical' ? 'CRITICAL' : (log.severity === 'high' ? 'HIGH' : (log.severity === 'medium' ? 'MEDIUM' : 'LOW')) }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="risk-container">
+                            <span class="risk-number" :class="getRiskColor(log.risk_score)">
+                                {{ log.risk_score || 0 }}
+                            </span>
+                            <div class="risk-bar-bg">
+                                <div class="risk-bar-fill" :class="getRiskColor(log.risk_score)" :style="{ width: (log.risk_score || 0) + '%' }"></div>
+                            </div>
+                        </div>
                     </td>
 
                     <td class="why">
-                        {{ log.why }}
+                        <div class="truncate max-w-xs">{{ log?.why || 'Not specified' }}</div>
+                        <div class="mitre-tag mt-1" v-if="log.mitre_technique">
+                            <i class="fas fa-shield-halved"></i> MITRE: {{ log.mitre_technique }}
+                        </div>
                     </td>
 
                     <td>
-                        <span :class="log.raw_data.source === 'AI' ? 'badge-ai' : 'badge-system'">
-                            {{ log.raw_data.source }}
+                        <span :class="log?.raw_data?.source && log.raw_data.source.includes('AI') ? 'badge-ai' : 'badge-system'">
+                            {{ log?.raw_data?.source ? log.raw_data.source.split(' ')[0] : 'SYSTEM' }}
                         </span>
                     </td>
 
                     <td class="actions">
-                        <button @click="openDetails(log)">Detay</button>
-                        <button @click="triggerFix(log)" class="fix-btn">FIX</button>
+                        <button @click="openDetails(log)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-1.5 rounded-lg font-bold transition flex items-center gap-2 border border-slate-200">
+                            <i class="fas fa-magnifying-glass text-xs"></i> Investigate
+                        </button>
                     </td>
                 </tr>
             </tbody>
         </table>
 
         <div v-if="incidents.length === 0" class="empty-state">
-            <i class="fas fa-check-circle"></i>
-            <h4>Tüm Sistemler Normal</h4>
+            <i class="fas fa-check-circle animate-pulse"></i>
+            <h4 class="text-xl font-bold text-slate-800">All Systems Normal</h4>
+            <p class="text-slate-500 mt-2">No security breaches or anomalies detected.</p>
         </div>
-
     </section>
+
+    <div v-if="showDetailModal" class="fixed inset-0 bg-slate-900 bg-opacity-70 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-xl shadow-2xl max-w-3xl w-full mx-4 overflow-hidden flex flex-col max-h-[90vh]">
+            
+            <div class="bg-slate-800 text-white px-6 py-4 flex justify-between items-center border-b border-slate-700">
+                <h3 class="text-lg font-bold flex items-center uppercase tracking-wide">
+                    <i class="fas mr-3 text-blue-400"></i> Technical Incident Analysis
+                </h3>
+                <button @click="showDetailModal = false" class="text-gray-400 hover:text-white transition">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <div class="p-8 overflow-y-auto" v-if="selectedLog">
+                
+                <div class="flex justify-between items-start mb-8 border-b border-slate-100 pb-6">
+                    <div>
+                        <h4 class="text-3xl font-black text-slate-800 tracking-tight uppercase">{{ selectedLog.raw_data?.cmd || 'Unknown' }}</h4>
+                        <p class="text-md text-slate-500 mt-2 font-medium">{{ selectedLog.what }}</p>
+                    </div>
+                    <div class="text-right">
+                        <div :class="'px-6 py-2 rounded-xl text-lg font-black border shadow-sm ' + (selectedLog.risk_score >= 90 ? 'bg-red-50 text-red-700 border-red-200' : 'bg-orange-50 text-orange-700 border-orange-200')">
+                            RISK: {{ selectedLog.risk_score }} / 100
+                        </div>
+                        <p class="text-xs text-slate-400 mt-3 font-mono tracking-widest">{{ selectedLog.when }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-2">IDENTITY (WHO)</span>
+                        <span class="text-sm font-mono text-slate-700 font-bold">{{ selectedLog.who }}</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-2">LOCATION (WHERE)</span>
+                        <span class="text-sm font-mono text-slate-700 font-bold">{{ selectedLog.where }}</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-2">CATEGORY</span>
+                        <span class="text-sm font-bold text-slate-700 uppercase">{{ selectedLog.category || 'GENERAL' }}</span>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest block mb-2">SOURCE</span>
+                        <span class="text-sm font-bold text-slate-700 uppercase">{{ selectedLog.raw_data?.source || 'SYSTEM' }}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-red-50 border-l-4 border-red-500 p-5 rounded-r-xl shadow-sm">
+                        <h5 class="text-xs font-black text-red-800 mb-2 flex items-center uppercase tracking-widest">
+                            <i class="fas  mr-2 text-red-500"></i> System Detection (Anomaly)
+                        </h5>
+                        <p class="text-md text-red-700 font-semibold leading-relaxed">{{ selectedLog.why }}</p>
+                        
+                        <div v-if="selectedLog.mitre_technique" class="mt-4 inline-flex items-center bg-white border border-red-200 text-red-600 text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-sm">
+                            <i class="fas fa-shield-halved mr-2"></i> MITRE ATT&CK: {{ selectedLog.mitre_technique }}
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-5 rounded-r-xl shadow-sm">
+                        <h5 class="text-xs font-black text-blue-800 mb-2 flex items-center uppercase tracking-widest">
+                            <i class=" text-blue-500"></i> AI Resolution & Prevention
+                        </h5>
+                        <p class="text-md text-blue-700 font-semibold leading-relaxed">{{ selectedLog.suggested_action || 'Manual investigation and system log review recommended.' }}</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="bg-slate-50 px-8 py-5 border-t border-slate-200 flex justify-end gap-4">
+                <button @click="showDetailModal = false" class="text-slate-500 hover:text-slate-800 font-bold text-sm transition px-4 uppercase tracking-widest">
+                    Dismiss
+                </button>
+                <button @click="showDetailModal = false; triggerFix(selectedLog)" class="bg-red-600 hover:bg-red-700 text-white px-8 py-3 rounded-xl font-black text-sm shadow-lg transition flex items-center gap-2 transform active:scale-95 uppercase tracking-widest">
+                    <i class="fas fa-bolt"></i> Remediate Now
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <div v-if="showFixModal" class="fixed inset-0 bg-slate-900 bg-opacity-80 flex items-center justify-center z-[60] backdrop-blur-md transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden border-2 border-red-100">
+            <div class="bg-red-600 text-white px-6 py-5 flex justify-between items-center">
+                <h3 class="text-lg font-black flex items-center uppercase tracking-widest">
+                    <i class="fas fa-skull-crossbones mr-3 text-yellow-300"></i> System Intervention Approval
+                </h3>
+                <button @click="showFixModal = false" class="text-red-200 hover:text-white transition">
+                    <i class="fas fa-times text-2xl"></i>
+                </button>
+            </div>
+            <div class="p-8">
+                <p class="text-slate-700 mb-6 font-semibold text-lg leading-snug text-center">
+                    Per security protocols, this operation will be executed with <strong>ROOT</strong> privileges.
+                </p>
+                <div class="bg-slate-900 text-green-400 p-5 rounded-xl font-mono text-sm shadow-2xl border border-slate-700 relative group">
+                    <div class="absolute top-2 right-3 text-[10px] text-slate-500 font-bold uppercase">Terminal</div>
+                    <i class="fas fa-terminal mr-3 text-slate-500"></i> {{ fixCommand }}
+                </div>
+            </div>
+            <div class="bg-slate-50 px-8 py-6 border-t flex flex-col gap-3">
+                <button @click="executeFix" class="w-full bg-red-600 hover:bg-red-700 text-white py-4 rounded-xl font-black shadow-xl transition transform active:scale-95 uppercase tracking-widest flex justify-center items-center gap-3">
+                    <i class="fas fa-gavel text-xl"></i> Approve & Execute
+                </button>
+                <button @click="showFixModal = false" class="w-full py-3 text-slate-400 hover:text-slate-600 font-bold text-sm transition uppercase tracking-widest">
+                    Abort Operation
+                </button>
+            </div>
+        </div>
+    </div>
 
 </div>
 
-<script src="assets/js/script.js"></script>
+<script src="/assets/js/script.js"></script>
+
 </body>
 </html>

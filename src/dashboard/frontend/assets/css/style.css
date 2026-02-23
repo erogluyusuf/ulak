@@ -1,196 +1,262 @@
-[v-cloak] { display: none; }
-
 body {
-    background: #f5f7fa;
-    font-family: Inter, sans-serif;
+    background: #f8fafc;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: #1e293b;
+    margin: 0;
+    padding: 0;
 }
 
 .dashboard-layout {
     max-width: 1400px;
     margin: auto;
-    padding: 40px;
+    padding: 40px 20px;
 }
 
 /* HEADER */
-
 .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
-
 .dashboard-title {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #0f172a;
 }
-
 .dashboard-sub {
-    font-size: 12px;
+    font-size: 13px;
     color: #64748b;
-    margin-top: 4px;
+    margin-top: 2px;
 }
-
 .header-right {
     display: flex;
     align-items: center;
     gap: 20px;
 }
-
 .last-update {
     text-align: right;
     font-size: 11px;
     color: #64748b;
 }
-
 .last-update strong {
     display: block;
     font-size: 13px;
     color: #0f172a;
 }
-
 .refresh-btn {
     background: white;
     border: 1px solid #e2e8f0;
-    padding: 10px 12px;
+    padding: 10px 14px;
     border-radius: 8px;
     cursor: pointer;
+    color: #475569;
 }
-
-.refresh-btn:hover {
-    background: #f1f5f9;
-}
-
+.refresh-btn:hover { background: #f1f5f9; color: #0f172a; }
 
 /* STATS */
-
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 30px;
 }
-
 .stat-card {
     background: white;
-    padding: 25px;
-    border-radius: 12px;
+    padding: 24px;
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
-
 .stat-card p {
-    font-size: 12px;
+    font-size: 13px;
     color: #64748b;
+    font-weight: 500;
 }
-
 .stat-card h3 {
-    font-size: 32px;
+    font-size: 36px;
     font-weight: 800;
-    margin-top: 5px;
+    margin-top: 8px;
+    color: #0f172a;
 }
-
 .stat-card.blue h3 { color: #2563eb; }
 .stat-card.green h3 { color: #16a34a; }
 
-
 /* TABLE */
-
 .table-wrapper {
     background: white;
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
-    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    overflow-x: auto; /* Mobilde tablonun yatay kaydırılmasını sağlar */
+    -webkit-overflow-scrolling: touch; /* iOS cihazlarda akıcı kaydırma */
 }
-
 .incident-table {
     width: 100%;
     border-collapse: collapse;
+    min-width: 800px; /* Tablonun mobilde çok ezilmemesi için minimum genişlik */
 }
-
 .incident-table th {
     text-align: left;
-    font-size: 11px;
-    letter-spacing: 1px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
-    padding: 16px 20px;
+    padding: 16px 24px;
     background: #f8fafc;
     color: #64748b;
+    font-weight: 600;
+    border-bottom: 1px solid #e2e8f0;
 }
-
 .incident-table td {
-    padding: 18px 20px;
-    border-top: 1px solid #f1f5f9;
+    padding: 18px 24px;
+    border-bottom: 1px solid #f1f5f9;
     font-size: 14px;
+    vertical-align: middle;
 }
+.incident-table tr:last-child td { border-bottom: none; }
+.incident-table tr:hover { background: #f8fafc; }
 
-.incident-table tr:hover {
-    background: #f8fafc;
-}
+.time { font-family: monospace; color: #64748b; font-size: 13px; }
+.pid { font-size: 12px; color: #94a3b8; margin-top: 4px; font-family: monospace; }
+.why { max-width: 350px; line-height: 1.5; color: #334155; }
 
-.time {
-    font-family: monospace;
-    color: #64748b;
-    font-size: 12px;
-}
-
-.pid {
-    font-size: 11px;
-    color: #94a3b8;
-}
-
-.why {
-    max-width: 400px;
-}
-
-.badge-ai {
-    background: #dbeafe;
-    color: #1d4ed8;
+/* SEVERITY BADGES */
+.badge-severity {
     padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.badge-system {
-    background: #e2e8f0;
-    color: #475569;
-    padding: 5px 10px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.actions button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 12px;
-    margin-right: 10px;
-    color: #2563eb;
-}
-
-.fix-btn {
-    background: #0f172a;
-    color: white !important;
-    padding: 6px 14px;
     border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: inline-block;
 }
-.fix-btn:hover {
-    background: #2563eb;
+.badge-severity.critical { background: #fee2e2; color: #e11d48; border: 1px solid #fecdd3; }
+.badge-severity.high { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+.badge-severity.medium { background: #fef9c3; color: #b45309; border: 1px solid #fef08a; }
+.badge-severity.low { background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+
+/* RISK SCORE BAR */
+.risk-container { display: flex; align-items: center; gap: 10px; width: 120px; }
+.risk-number { font-size: 13px; font-weight: 700; font-family: monospace; min-width: 25px; }
+.risk-bar-bg { flex-grow: 1; height: 6px; background: #e2e8f0; border-radius: 999px; overflow: hidden; }
+.risk-bar-fill { height: 100%; border-radius: 999px; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+
+.risk-critical { color: #e11d48; } .risk-bar-fill.risk-critical { background: #e11d48; }
+.risk-high { color: #ea580c; } .risk-bar-fill.risk-high { background: #ea580c; }
+.risk-medium { color: #ca8a04; } .risk-bar-fill.risk-medium { background: #ca8a04; }
+.risk-low { color: #16a34a; } .risk-bar-fill.risk-low { background: #16a34a; }
+
+/* MITRE TAG */
+.mitre-tag {
+    margin-top: 8px;
+    font-size: 11px;
+    color: #475569;
+    background: #f8fafc;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid #e2e8f0;
+    font-weight: 600;
 }
 
+/* SOURCE BADGES */
+.badge-ai { background: #eff6ff; color: #1d4ed8; padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; border: 1px solid #bfdbfe; }
+.badge-system { background: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; border: 1px solid #e2e8f0; }
+
+/* ACTIONS */
+.actions { display: flex; align-items: center; gap: 15px; }
+.actions button { font-size: 13px; font-weight: 600; outline: none; }
+.fix-btn {
+    background: #0f172a !important; color: white !important;
+    padding: 8px 18px !important; border-radius: 8px !important;
+}
+.fix-btn:hover { background: #2563eb !important; transform: translateY(-1px); }
 
 /* EMPTY STATE */
+.empty-state { padding: 100px 20px; text-align: center; color: #64748b; }
+.empty-state i { font-size: 48px; color: #22c55e; margin-bottom: 20px; opacity: 0.9; }
+.empty-state h4 { font-size: 20px; color: #0f172a; font-weight: 700; margin-bottom: 8px; }
 
-.empty-state {
-    padding: 80px;
-    text-align: center;
-    color: #64748b;
+
+/* ==========================================================================
+   MOBİL UYUMLULUK (RESPONSIVE) AYARLARI
+   ========================================================================== */
+
+/* Tablet ve Büyük Telefonlar */
+@media screen and (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
 }
 
-.empty-state i {
-    font-size: 40px;
-    color: #16a34a;
-    margin-bottom: 15px;
+/* Telefonlar */
+@media screen and (max-width: 768px) {
+    .dashboard-layout {
+        padding: 20px 15px;
+    }
+
+    /* Header'ı alt alta diz */
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    /* Güncelleme butonunu sağa daya */
+    .header-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .dashboard-title {
+        font-size: 24px;
+    }
+
+    /* İstatistik kartlarını daralt */
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 20px;
+    }
+
+    .stat-card h3 {
+        font-size: 28px;
+    }
+
+    /* Tablo hücre boşluklarını daralt */
+    .incident-table th, 
+    .incident-table td {
+        padding: 12px 16px;
+    }
+
+    .empty-state {
+        padding: 60px 15px;
+    }
+}
+
+/* Küçük Ekranlı Telefonlar (iPhone SE vb.) */
+@media screen and (max-width: 480px) {
+    .dashboard-title {
+        font-size: 22px;
+    }
+
+    .last-update strong {
+        font-size: 12px;
+    }
+
+    .incident-table th, 
+    .incident-table td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .risk-container {
+        width: 90px;
+    }
 }

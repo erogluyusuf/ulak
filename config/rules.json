@@ -3,28 +3,37 @@
         "engine_version": "3.0",
         "last_update": "2026-02-22",
         "threat_model": {
-        "framework": "MITRE ATT&CK",
-        "version": "14.1",
-        "enabled": true,
-        "auto_map_missing": true
-    },
-    "asset_awareness": {
-      "enabled": true,
-      "rules": {
-        "root_user_multiplier": 1.7,
-        "system_process_multiplier": 1.4,
-        "network_facing_process_multiplier": 1.6,
-        "container_process_multiplier": 1.3
-      }
-    },
-    "risk_engine": {
-        "enabled": true,
-        "base_severity_weights": { "low": 10, "medium": 40, "high": 75, "critical": 95 },
-        "risk_escalation": {
-            "enabled": true, "repeat_multiplier": 1.25, "time_window_sec": 120, "decay_factor": 0.92, "max_risk_cap": 100
+            "framework": "MITRE ATT&CK",
+            "version": "14.1",
+            "enabled": true,
+            "auto_map_missing": true
+        },
+        "asset_awareness": {
+            "enabled": true,
+            "rules": {
+                "root_user_multiplier": 1.7,
+                "system_process_multiplier": 1.4,
+                "network_facing_process_multiplier": 1.6,
+                "container_process_multiplier": 1.3
+            }
+        },
+        "risk_engine": {
+            "enabled": true,
+            "base_severity_weights": {
+                "low": 10,
+                "medium": 40,
+                "high": 75,
+                "critical": 95
+            },
+            "risk_escalation": {
+                "enabled": true,
+                "repeat_multiplier": 1.25,
+                "time_window_sec": 120,
+                "decay_factor": 0.92,
+                "max_risk_cap": 100
+            }
         }
-        }
-     },
+    },
     "exit_codes": {
         "1": {
             "description": "System Error: Operation not permitted",
@@ -831,7 +840,9 @@
             "description": "Apache: Port bind failed. Check if port 80/443 is used by another app.",
             "severity": "high",
             "risk_score": 50,
-            "category": "service"
+            "category": "service",
+            "action": "Check system configuration for conflicting services.",
+            "action_cmd": "ps aux | grep -i port"
         },
         "reverse_shell": {
             "regex": "nc .* -e|bash -i >& /dev/tcp",
@@ -839,153 +850,237 @@
             "severity": "critical",
             "risk_score": 98,
             "category": "security",
-            "mitre": { "tactic": "Execution", "technique": "T1059" }
+            "mitre": { "tactic": "Execution", "technique": "T1059" },
+            "action": "Kill specific malicious PID immediately.",
+            "action_cmd": "kill -9 {pid}"
         },
         "ddos_indicator": {
             "regex": "SYN flood|possible SYN flooding",
             "description": "Potential DDoS attack indicator.",
             "severity": "critical",
             "risk_score": 95,
-            "category": "network"
+            "category": "network",
+            "action": "Block suspicious IP addresses and monitor network traffic.",
+            "action_cmd": ""
         },
         "disk_full": {
             "regex": "No space left on device",
             "description": "Disk is full.",
             "severity": "high",
             "risk_score": 75,
-            "category": "system"
+            "category": "system",
+            "action": "Check system logs for disk usage patterns and free up space if necessary.",
+            "action_cmd": ""
         },
         "docker_exit": {
             "regex": "container .* exited with code",
             "description": "Container stopped unexpectedly.",
             "severity": "medium",
             "risk_score": 60,
-            "category": "container"
+            "category": "container",
+            "action": "Check container logs for error messages and restart if necessary.",
+            "action_cmd": ""
         },
         "address_already_in_use": {
             "regex": "Address already in use",
             "description": "Network conflict: Port is already bound.",
             "severity": "medium",
             "risk_score": 50,
-            "category": "service"
+            "category": "service",
+            "action": "Check system logs for port usage patterns and free up port if necessary.",
+            "action_cmd": ""
         },
         "access_denied_for_user": {
             "regex": "Access denied for user",
             "description": "DB Error: Authentication failed.",
             "severity": "high",
             "risk_score": 75,
-            "category": "service"
+            "category": "service",
+            "action": "Check database logs for error messages and investigate authentication issues.",
+            "action_cmd": ""
         },
         "can't_connect_to_local_mysql_server": {
             "regex": "Can't connect to local MySQL server",
             "description": "MySQL Error: Socket file missing.",
             "severity": "medium",
             "risk_score": 50,
-            "category": "service"
+            "category": "service",
+            "action": "Check MySQL logs for error messages and investigate connection issues.",
+            "action_cmd": ""
         },
         "no_such_file_or_directory": {
             "regex": "No such file or directory",
             "description": "Path Error: A required file or binary is missing.",
             "severity": "medium",
             "risk_score": 50,
-            "category": "service"
+            "category": "service",
+            "action": "Check system logs for error messages and investigate missing files or binaries.",
+            "action_cmd": ""
         },
         "permission_denied": {
             "regex": "Permission denied",
             "description": "Security Error: Check file/folder permissions.",
             "severity": "medium",
             "risk_score": 50,
-            "category": "service"
+            "category": "service",
+            "action": "Check system logs for error messages and investigate permission issues.",
+            "action_cmd": ""
         },
         "apache_error": {
             "regex": "AH[0-9]{5}",
             "description": "Apache HTTPD internal error code.",
             "severity": "critical",
             "risk_score": 90,
-            "category": "service"
+            "category": "service",
+            "action": "Check Apache logs for error messages and investigate internal error causes.",
+            "action_cmd": ""
         },
         "kernel_panic": {
             "regex": "Kernel panic|Out of memory",
             "description": "Critical Linux Kernel event.",
             "severity": "critical",
             "risk_score": 95,
-            "category": "system"
+            "category": "system",
+            "action": "Check system logs for error messages and investigate kernel issues.",
+            "action_cmd": ""
         },
         "postgresql_log": {
             "regex": "%{DATESTAMP:timestamp} %{TZ} %{DATA:user_id}",
             "description": "Postgres Log Pattern",
             "severity": "low",
             "risk_score": 30,
-            "category": "service"
+            "category": "service",
+            "action": "Monitor PostgreSQL logs for performance and security issues.",
+            "action_cmd": ""
         },
         "redis_log": {
             "regex": "\\[%{POSINT:pid}\\] %{REDISTIMESTAMP:timestamp}",
             "description": "Redis Log Pattern",
             "severity": "low",
             "risk_score": 30,
-            "category": "service"
+            "category": "service",
+            "action": "Monitor Redis logs for performance and security issues.",
+            "action_cmd": ""
         },
         "syslog_critical": {
             "regex": "syslog5424line",
             "description": "Linux Syslog 5424 Standard Line",
             "severity": "low",
             "risk_score": 30,
-            "category": "service"
+            "category": "service",
+            "action": "Monitor syslog logs for system and service issues.",
+            "action_cmd": ""
         }
     },
     "behavior_engine": {
-    "enabled": true,
+        "enabled": true,
         "rules": {
-        "high_exit_rate": {
-            "metric": "process_exit", "threshold": 25, "window_sec": 60,
-            "severity": "high", "risk_score": 75, "description": "High process crash rate detected."
-        },
-        "rapid_command_execution": {
-            "metric": "command_spawn", "threshold": 50, "window_sec": 60,
-            "severity": "high", "risk_score": 80, "description": "Unusual rapid command execution pattern."
-        }
+            "high_exit_rate": {
+                "metric": "process_exit",
+                "threshold": 25,
+                "window_sec": 60,
+                "severity": "high",
+                "risk_score": 75,
+                "description": "High process crash rate detected."
+            },
+            "rapid_command_execution": {
+                "metric": "command_spawn",
+                "threshold": 50,
+                "window_sec": 60,
+                "severity": "high",
+                "risk_score": 80,
+                "description": "Unusual rapid command execution pattern."
+            }
         }
     },
     "correlation_engine": {
-    "enabled": true,
+        "enabled": true,
         "rules": {
-        "ssh_bruteforce_then_success": {
-            "sequence": ["ssh_failed_login", "ssh_login_success"],
-            "within_sec": 120, "severity": "critical", "risk_score": 98,
-            "description": "Brute force followed by successful login.",
-            "mitre": { "tactic": "Credential Access", "technique": "T1059" }
-        },
-        "reverse_shell_after_privilege_escalation": {
-            "sequence": ["privilege_escalation", "reverse_shell"],
-            "within_sec": 180, "severity": "critical", "risk_score": 99,
-            "description": "Privilege escalation followed by reverse shell.",
-            "mitre": { "tactic": "Execution", "technique": "T1059" }
-        }
+            "ssh_bruteforce_then_success": {
+                "sequence": [
+                    "ssh_failed_login",
+                    "ssh_login_success"
+                ],
+                "within_sec": 120,
+                "severity": "critical",
+                "risk_score": 98,
+                "description": "Brute force followed by successful login.",
+                "mitre": {
+                    "tactic": "Credential Access",
+                    "technique": "T1059"
+                }
+            },
+            "reverse_shell_after_privilege_escalation": {
+                "sequence": [
+                    "privilege_escalation",
+                    "reverse_shell"
+                ],
+                "within_sec": 180,
+                "severity": "critical",
+                "risk_score": 99,
+                "description": "Privilege escalation followed by reverse shell.",
+                "mitre": {
+                    "tactic": "Execution",
+                    "technique": "T1059"
+                }
+            }
         }
     },
     "incident_engine": {
-    "enabled": true,
-        "grouping": { "group_by": ["pid", "source_ip", "rule_name"], "time_window_sec": 300 },
+        "enabled": true,
+        "grouping": {
+            "group_by": [
+                "pid",
+                "source_ip",
+                "rule_name"
+            ],
+            "time_window_sec": 300
+        },
         "incident_levels": {
-        "low": { "threshold": 30 }, "medium": { "threshold": 60 }, "high": { "threshold": 80 }, "critical": { "threshold": 95 }
+            "low": {
+                "threshold": 30
+            },
+            "medium": {
+                "threshold": 60
+            },
+            "high": {
+                "threshold": 80
+            },
+            "critical": {
+                "threshold": 95
+            }
         },
         "auto_response": {
-        "enabled": false,
-        "actions": { "block_ip": false, "kill_process": false, "disable_user": false }
+            "enabled": false,
+            "actions": {
+                "block_ip": false,
+                "kill_process": false,
+                "disable_user": false
+            }
         }
     },
     "persistence_detection": {
         "enabled": true,
-        "monitor_paths": ["/etc/cron", "/etc/systemd/system", "/usr/lib/systemd/system"]
+        "monitor_paths": [
+            "/etc/cron",
+            "/etc/systemd/system",
+            "/usr/lib/systemd/system"
+        ]
     },
     "integrity_monitoring": {
         "enabled": true,
-        "critical_paths": ["/bin", "/usr/bin", "/sbin", "/usr/sbin"]
+        "critical_paths": [
+            "/bin",
+            "/usr/bin",
+            "/sbin",
+            "/usr/sbin"
+        ]
     },
-  "ioc": {
-    "enabled": true,
+    "ioc": {
+        "enabled": true,
         "match_strategy": "exact_or_partial",
-        "malicious_ips": [], "malicious_domains": [], "file_hashes": []
-  }
-    
+        "malicious_ips": [],
+        "malicious_domains": [],
+        "file_hashes": []
+    }
 }
