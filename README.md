@@ -78,13 +78,11 @@ Captured anomalies are analyzed by a **Local LLM** (Large Language Model) to gen
    ```
 
 4. **Start the ULAK Services:**
-```bash
-    # Terminal 1: Start the AI Dashboard
+
+  ```bash
     sudo python3 src/dashboard/app.py
-  
-    # Terminal 2: Start the eBPF Sensor
     sudo python3 src/ebpf/handler.py
-```
+  ```
 3. **Start the ULAK Services:** ``` Open http://localhost:8000``` in your browser.
 ## How it Works
 
