@@ -83,24 +83,11 @@ The integrated `setup.sh` script automates everything: Docker installation (if m
 ```
 
 4. **Management:** Since ULAK runs as a native system service, you can manage it using standard Linux commands:
-- **Check Status**
-  ```bash
-  sudo systemctl status ulak
-  ```
-- **View Real-time Logs**
-  ```bash
-  sudo journalctl -u ulak -f
-  ```
-- **Uninstall**
-  ```bash
-  sudo ./setup.sh --uninstall
-  ```
+* **Check Status:** `sudo systemctl status ulak`
+* **View Logs:** `sudo journalctl -u ulak -f`
+* **Uninstall:** ` ./setup.sh --uninstall`
 
-5. **Dashboard:** Open the dashboard in your browser:
-  ```bash
-  http://localhost:8000
-  ```
-
+5. * **Dashboard:** Open the dashboard in your browser: `http://localhost:8000`
 
 ## How it Works
 
