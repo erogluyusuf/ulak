@@ -73,17 +73,17 @@ Captured anomalies are analyzed by a **Local LLM** (Large Language Model) to gen
 
 2. **Run the setup script:**
  
-   ```bash
+```bash
       chmod +x setup.sh
       ./setup.sh
-  ```
+```
 
 3. **Start the ULAK Services:**
 
-  ```bash
+```bash
     sudo python3 src/dashboard/app.py
     sudo python3 src/ebpf/handler.py
-  ```
+```
 4. **Start the ULAK Services:** ``` Open http://localhost:8000``` in your browser.
 ## How it Works
 
