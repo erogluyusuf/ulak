@@ -23,17 +23,15 @@ Captured anomalies are analyzed by a **Local LLM** (Large Language Model) to gen
 ---
 
 ##  Key Features
+- **eBPF Real-Time Sensing:** Low-overhead kernel monitoring using C probes to detect reverse shells, unauthorized access, and network anomalies.
+- **Local AI Diagnostics:** Privacy-first analysis using local LLMs (Ollama) to interpret complex system errors into human-readable 5W1H reports.
+- **Interactive SOC Dashboard:** A modern, mobile-responsive web interface built with Vue 3 and Tailwind CSS for centralized monitoring.
+- **Interactive Mascot Notifications:** Real-time desktop alerts with active "Remediate" and "Dismiss" actions that bypass root barriers.
+- **Automated Remediation:** One-click execution of AI-suggested fixes (Process termination, service restarts) directly from the dashboard or desktop.
 
-** eBPF Real-Time Sensing: ** Low-overhead kernel monitoring using C probes to detect reverse shells, unauthorized access, and network anomalies.
-** Local AI Diagnostics: ** Privacy-first analysis using local LLMs (Ollama) to interpret complex system errors into human-readable 5W1H reports.
-** Interactive SOC Dashboard: ** A modern, mobile-responsive web interface built with Vue 3 and Tailwind CSS for centralized monitoring.
-** Interactive Mascot Notifications: ** Real-time desktop alerts with active "Remediate" and "Dismiss" actions that bypass root barriers.
-** Automated Remediation: ** One-click execution of AI-suggested fixes (Process termination, service restarts) directly from the dashboard or desktop.
-
-
+---
 
 ## Preview
-
 <div align="center">
   <img src="docs/assets/dashboard.gif" alt="Ulak Dashboard Preview" width="900" style="border-radius: 10px; border: 2px solid #222;">
   <p><i>The ULAK AI SOC Interface: Real-time incident streaming and diagnostic analysis.</i></p>
