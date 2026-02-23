@@ -42,7 +42,7 @@ async def send_interactive_mascot_notification(incident):
     icon_path = os.path.join(FRONTEND_DIR, "assets", "mascot.png")
     icon_arg = f"-i {icon_path}" if os.path.exists(icon_path) else ""
 
-    title = "ULAK: CRITICAL THREAT"
+    title = "ULAK"
     msg = f"Anomaly detected, Boss!\nProcess: {cmd} (PID: {pid})\nReason: {why}"
 
     # KRİTİK DÜZELTME: '-w' eklendi! Python artık butona basılmasını bekleyecek.
