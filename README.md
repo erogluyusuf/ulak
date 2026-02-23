@@ -64,7 +64,9 @@ Captured anomalies are analyzed by a **Local LLM** (Large Language Model) to gen
 - **Tools:** `bcc-tools`, `python3.14+`, `Ollama`
 - **Permissions:** Root access required for eBPF syscall hooking.
 
-### Installation
+### Installation & Auto-Start
+The integrated `setup.sh` script automates everything: Docker installation (if missing), eBPF dependencies, AI model pulling, and systemd service registration.
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/erogluyusuf/ulak.git
@@ -76,15 +78,30 @@ Captured anomalies are analyzed by a **Local LLM** (Large Language Model) to gen
 ```bash
       chmod +x setup.sh
       ./setup.sh
+      sudo chmod +x setup.sh
+      sudo ./setup.sh
 ```
 
-3. **Start the ULAK Services:**
+4. **Management:** Since ULAK runs as a native system service, you can manage it using standard Linux commands:
+- **Check Status**
+  ```bash
+  sudo systemctl status ulak
+  ```
+- **View Real-time Logs**
+  ```bash
+  sudo journalctl -u ulak -f
+  ```
+- **Uninstall**
+  ```bash
+  sudo ./setup.sh --uninstall
+  ```
 
-```bash
-    sudo python3 src/dashboard/app.py
-    sudo python3 src/ebpf/handler.py
-```
-4. **Start the ULAK Services:** ``` Open http://localhost:8000``` in your browser.
+5. **Dashboard:** Open the dashboard in your browser:
+  ```bash
+  http://localhost:8000
+  ```
+
+
 ## How it Works
 
 ### Detection  
