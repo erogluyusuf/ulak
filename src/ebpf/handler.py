@@ -23,24 +23,15 @@ class UlakHandler:
         self.event_history = {}
 
     def load_rules(self):
+
         try:
             if os.path.exists(RULES_PATH):
                 with open(RULES_PATH, "r", encoding="utf-8") as f:
                     return json.load(f)
             return {"exit_codes": {}, "service_patterns": {}, "meta": {}}
         except Exception as e:
-            print(f"[!] Hata: rules.json yüklenemedi: {e}")
+            print(f"[!] Error: rules.json could not be loaded: {e}")
             return {"exit_codes": {}, "service_patterns": {}, "meta": {}}
-
-    def send_desktop_notification(self, title, msg, severity):
-
-        if severity not in ["high", "critical"]:
-            return
-        try:
-            icon = "error" if severity == "critical" else "warning"
-            subprocess.run(['notify-send', '-u', 'critical', '-i', icon, title, msg])
-        except:
-            pass
 
     def get_diagnosis(self, cmd, exit_code, pid, uid):
 
@@ -66,7 +57,7 @@ class UlakHandler:
                     "risk_score": data.get("risk_score", 50),
                     "category": data.get("category", "security"),
                     "mitre": data.get("mitre", None),
-                    "action": data.get("action", "Inspect the related service and system logs.")
+                    "action": data.get("action", "Inspect the related service.")
                 })
                 matched = True
                 break
@@ -90,173 +81,120 @@ class UlakHandler:
                 base_diagnosis["diagnosis"] = ai_report.get("diagnosis", "Heuristic analysis failed.")
                 base_diagnosis["action"] = ai_report.get("action", "Manual investigation required.")
                 base_diagnosis["risk_score"] = 20
-            except:
-                pass
+            except: pass
 
         meta = self.rules.get("meta", {})
-        final_risk_score = base_diagnosis["risk_score"]
-
+        final_score = base_diagnosis["risk_score"]
         if uid == 0 and meta.get("asset_awareness", {}).get("enabled", False):
             multiplier = meta["asset_awareness"].get("rules", {}).get("root_user_multiplier", 1.0)
-            final_risk_score = int(final_risk_score * multiplier)
+            final_score = int(final_score * multiplier)
 
         max_cap = meta.get("risk_engine", {}).get("risk_escalation", {}).get("max_risk_cap", 100)
-        final_risk_score = min(final_risk_score, max_cap)
-        base_diagnosis["risk_score"] = final_risk_score
+        base_diagnosis["risk_score"] = min(final_score, max_cap)
 
-        if final_risk_score >= 95:
-            base_diagnosis["severity"] = "critical"
-        elif final_risk_score >= 75:
-            base_diagnosis["severity"] = "high"
-        elif final_risk_score >= 40:
-            base_diagnosis["severity"] = "medium"
-        else:
-            base_diagnosis["severity"] = "low"
+        if base_diagnosis["risk_score"] >= 95: base_diagnosis["severity"] = "critical"
+        elif base_diagnosis["risk_score"] >= 75: base_diagnosis["severity"] = "high"
+        elif base_diagnosis["risk_score"] >= 40: base_diagnosis["severity"] = "medium"
+        else: base_diagnosis["severity"] = "low"
 
         return base_diagnosis
 
     def print_event(self, cpu, data, size):
+
         event = self.b["events"].event(data)
         cmd = event.comm.decode()
-
         uid = getattr(event, 'uid', os.getuid())
-
         if event.exit_code == 0: return
 
         event_key = f"{cmd}_{event.exit_code}"
         now = time.time()
-        if event_key in self.event_history and (now - self.event_history[event_key] < 60):
-            return
+        if event_key in self.event_history and (now - self.event_history[event_key] < 60): return
         self.event_history[event_key] = now
 
-        ignored = ["python3", "ollama", "docker", "handler.py", "systemd"]
-        if any(x in cmd for x in ignored) or event.pid == os.getpid(): return
-
         diag = self.get_diagnosis(cmd, event.exit_code, event.pid, uid)
-
         report = {
             "who": f"PID: {event.pid} (UID: {uid})",
-            "what": f"'Process '{cmd}' failed.",
-            "where": "Kernel Space",
+            "what": f"Process '{cmd}' failed.",
+            "where": "Kernel Space / Exit",
             "when": time.strftime('%Y-%m-%d %H:%M:%S'),
-            "why": diag.get("diagnosis"),
-            "severity": diag.get("severity"),
-            "risk_score": diag.get("risk_score"),
-            "category": diag.get("category"),
-            "mitre_technique": diag.get("mitre"),
-            "suggested_action": diag.get("action"),
-            "raw_data": {
-                "cmd": cmd, "pid": event.pid, "exit_code": event.exit_code, "source": diag.get("source")
-            }
+            "why": diag["diagnosis"],
+            "severity": diag["severity"],
+            "risk_score": diag["risk_score"],
+            "category": diag["category"],
+            "raw_data": {"cmd": cmd, "pid": event.pid, "exit_code": event.exit_code}
         }
 
         if report["risk_score"] >= 40:
-            mitre_tag = f" [MITRE: {report['mitre_technique']}]" if report['mitre_technique'] else ""
-            print(f"\n[!] ({report['severity'].upper()}): {cmd} | Skor: {report['risk_score']}{mitre_tag} | Neden: {report['why']}")
-
-        try:
-            requests.post(DASHBOARD_URL, json=report, timeout=1)
-        except:
-            pass
+            print(f"\n[!] ALERT: {cmd} | Score: {report['risk_score']} | Reason: {report['why']}")
+            try: requests.post(DASHBOARD_URL, json=report, timeout=1)
+            except: pass
 
     def print_exec_event(self, cpu, data, size):
+
         event = self.b["exec_events"].event(data)
-        caller = event.comm.decode('utf-8', 'replace')
-        target = event.fname.decode('utf-8', 'replace')
-        pcomm = event.pcomm.decode('utf-8', 'replace')
-        uid = event.uid
-        pid = event.pid
-        ppid = event.ppid
+        caller, target = event.comm.decode(), event.fname.decode()
 
-        try:
-            user_name = pwd.getpwuid(uid).pw_name
-        except:
-            user_name = f"UID:{uid}"
+        ignored = [
+            "python3", "ollama", "docker", "systemd", "handler.py",
+            "cpuUsage.sh", "plasma_waitforname", "bwrap", "glycin-svg",
+            "/usr/bin/cat", "/usr/bin/sed", "/usr/bin/ps",
+            "/usr/bin/which", "/usr/bin/sleep", "/usr/bin/users",
+            "/bin/sh", "/bin/bash", "/usr/bin/grep", "/usr/bin/awk",
+            "pkla-check-authorization", "revokefs-fuse", "fusermount3",
+            "notify-send", "sudo", "gpg", "desktop-database.trigger",
+            "update-desktop-database", "gtk-update-icon-cache",
+            "update-mime-database", "/usr/bin/cp", "glycin-image-rs",
+            "/proc/self/fd","adb", "pkill", "env", "bash"
+            ]
 
-        ignored_targets = ["/usr/bin/ps", "/usr/sbin/iptables", "/usr/bin/runc", "/usr/bin/containerd", "/usr/bin/which", "/usr/lib/NetworkManager"]
-        ignored_callers = ["python3", "ollama", "docker", "systemd", "handler.py", "firewalld", "nm-dispatcher", "grep", "awk", "sed", "sleep", "cat"]
+        if any(x in target for x in ignored) or event.pid == os.getpid(): return
 
-        if any(x in target for x in ignored_targets) or any(x in caller for x in ignored_callers) or pid == os.getpid():
-            return
+        try: user_name = pwd.getpwuid(event.uid).pw_name
+        except: user_name = f"UID:{event.uid}"
 
-        cmd_full = f"EXEC CHAIN: {pcomm}({ppid}) -> {caller}({pid}) -> {target}"
-
-        diag = self.get_diagnosis(cmd_full, 0, pid, uid)
-
-        if diag.get("risk_score", 0) >= 40:
-            report = {
-                "who": f"{user_name} (PID:{pid} | PPID:{ppid})",
-                "what": f"Critical file execution: {target}",
-                "where": "Kernel / Execve",
-                "when": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "why": diag.get("diagnosis", "Suspicious execution detected."),
-                "severity": diag.get("severity", "medium"),
-                "risk_score": diag.get("risk_score", 50),
-                "category": "execution",
-                "mitre_technique": diag.get("mitre", "T1059 (Command and Scripting Interpreter)"),
-                "suggested_action": diag.get("action", "Terminate process and verify authorization."),
-                "raw_data": {
-                    "cmd": cmd_full, "pid": pid, "exit_code": 0, "source": diag.get("source")
-                }
-            }
-
-            print(f"\n[!] EXECUTION DETECTED ({report['severity'].upper()}):")
-            print(f"    User : {user_name}")
-            print(f"    Chain    : {pcomm}({ppid}) -> {caller}({pid}) -> {target}")
-            print(f"    Scor      : {report['risk_score']}")
-
-            try:
-                requests.post(DASHBOARD_URL, json=report, timeout=1)
-            except:
-                pass
+        report = {
+            "who": f"{user_name} (PID:{event.pid})",
+            "what": f"Execution Detected: {target}",
+            "where": "Kernel / Execve",
+            "when": time.strftime('%Y-%m-%d %H:%M:%S'),
+            "why": "Binary execution monitored.",
+            "severity": "medium",
+            "risk_score": 45,
+            "category": "execution",
+            "raw_data": {"cmd": target, "pid": event.pid, "uid": event.uid}
+        }
+        print(f"\n[!] EXECUTION: {user_name} executed {target}")
+        try: requests.post(DASHBOARD_URL, json=report, timeout=1)
+        except: pass
 
     def print_file_event(self, cpu, data, size):
-        event = self.b["file_events"].event(data)
-        filename = event.filename.decode('utf-8', 'replace')
-        comm = event.comm.decode('utf-8', 'replace')
-        uid = event.uid
-        pid = event.pid
 
-        ignored_files = ["pipe", "socket", "null", "tty", "pts", "random", "urandom"]
-        if any(x in filename for x in ignored_files) or pid == os.getpid():
-            return
+        event = self.b["file_events"].event(data)
+        filename, comm = event.filename.decode('utf-8', 'replace'), event.comm.decode()
 
         critical_paths = ["passwd", "shadow", "sudoers", "config", "rules.json", ".bashrc"]
-        is_critical = any(cp in filename for cp in critical_paths)
+        if not any(cp in filename for cp in critical_paths): return
 
-        if is_critical:
-            try:
-                user_name = pwd.getpwuid(uid).pw_name
-            except:
-                user_name = f"UID:{uid}"
+        try: user_name = pwd.getpwuid(event.uid).pw_name
+        except: user_name = f"UID:{event.uid}"
 
-            report = {
-                "who": f"{user_name} (PID:{pid})",
-                "what": f"File Modification: {filename}",
-                "where": "VFS / Write",
-                "when": time.strftime('%Y-%m-%d %H:%M:%S'),
-                "why": "Unauthorized change to sensitive system file.",
-                "severity": "high",
-                "risk_score": 85,
-                "category": "file_integrity",
-                "mitre_technique": "T1565 (Data Manipulation)",
-                "suggested_action": "Verify file integrity and check process authority.",
-                "raw_data": {
-                    "cmd": comm, "filename": filename, "pid": pid, "uid": uid
-                }
-            }
-
-            print(f"\n[!] FILE INTEGRITY ALERT (HIGH):")
-            print(f"    User : {user_name}")
-            print(f"    File : {filename}")
-            print(f"    By   : {comm}")
-
-            try:
-                requests.post(DASHBOARD_URL, json=report, timeout=1)
-            except:
-                pass
+        report = {
+            "who": f"{user_name} (PID:{event.pid})",
+            "what": f"File Modified: {filename}",
+            "where": "VFS / Write",
+            "when": time.strftime('%Y-%m-%d %H:%M:%S'),
+            "why": "Sensitive file integrity change detected.",
+            "severity": "high",
+            "risk_score": 85,
+            "category": "file_integrity",
+            "raw_data": {"filename": filename, "pid": event.pid, "uid": event.uid, "by": comm}
+        }
+        print(f"\n[!] FILE INTEGRITY ALERT: {user_name} modified {filename} via {comm}")
+        try: requests.post(DASHBOARD_URL, json=report, timeout=1)
+        except: pass
 
     def run(self):
+
         path = os.path.join(os.path.dirname(__file__), "probe.c")
         with open(path, "r") as f:
             bpf_code = f.read()
@@ -264,16 +202,15 @@ class UlakHandler:
         self.b = BPF(text=bpf_code)
 
         self.b.attach_kprobe(event="do_exit", fn_name="trace_do_exit")
-        self.b["events"].open_perf_buffer(self.print_event)
-
-        self.b["exec_events"].open_perf_buffer(self.print_exec_event)
-
         self.b.attach_kprobe(event="vfs_write", fn_name="trace_vfs_write_entry")
+
+        self.b["events"].open_perf_buffer(self.print_event)
+        self.b["exec_events"].open_perf_buffer(self.print_exec_event)
         self.b["file_events"].open_perf_buffer(self.print_file_event)
 
         print("\n" + "="*60)
-        print(" ULAK EDR - TRIPLE ENGINE ACTIVE")
-        print(" MONITORING: [DO_EXIT], [EXECVE], [VFS_WRITE]")
+        print(" ULAK EDR - TRIPLE ENGINE ACTIVE (EXIT, EXEC, FIM)")
+        print(" MONITORING: Kernel Space Syscalls")
         print("="*60 + "\n")
 
         while True:
